@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HexGL Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>HexGL Debug Page</h1>
+    
+    <div class="test">
+        <h3>Testing Asset Loading:</h3>
+        <div id="results"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Console Log:</h3>
+        <div id="console"></div>
+    </div>
+
+    <script>
+        const results = document.getElementById('results');
+        const consoleDiv = document.getElementById('console');
+        
+        // Override console.log to show in page
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleDiv.innerHTML += args.join(' ') + '<br>';
+        };
+        
+        // Test loading key files
+        const testFiles = [
+            'libs/Three.dev.js',
+            'bkcore/hexgl/HexGL.js',
+            'launch.js',
+            'css/multi.css'
+        ];
+        
+        let loadedCount = 0;
+        
+        testFiles.forEach(file => {
+            const script = document.createElement('script');
+            script.src = file;
+            script.onload = () => {
+                loadedCount++;
+                results.innerHTML += `<div class="success">✅ ${file} loaded successfully</div>`;
+                if (loadedCount === testFiles.length) {
+                    results.innerHTML += '<div class="success"><strong>All files loaded! Game should work.</strong></div>';
+                }
+            };
+            script.onerror = () => {
+                results.innerHTML += `<div class="error">❌ ${file} failed to load</div>`;
+            };
+            document.head.appendChild(script);
+        });
+        
+        // Test CSS
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'css/multi.css';
+        css.onload = () => {
+            results.innerHTML += '<div class="success">✅ CSS loaded successfully</div>';
+        };
+        css.onerror = () => {
+            results.innerHTML += '<div class="error">❌ CSS failed to load</div>';
+        };
+        document.head.appendChild(css);
+        
+        console.log('Debug page loaded');
+    </script>
+</body>
+</html>
